@@ -1,6 +1,6 @@
-package com.hongda.gmall.realtime.apidemo;
+package com.hongda.gmall.realtime.demo.app.source;
 
-import com.hongda.gmall.realtime.util.MyKafkaUtil;
+import com.hongda.gmall.realtime.util.MyKafkaUtilHongda;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -18,8 +18,8 @@ public class KafkaSourceAndKafkaConsumerDemo  {
         env.setParallelism(1);  //生成环境设置为Kafka主题的分区数
 
         //TODO 2.读取 Kafka topic_db 主题数据创建流
-        DataStreamSource<String> kafkaDS1 = env.addSource(MyKafkaUtil.getKafkaConsumer("ods_db", "dim_app_2022_1"));
-        DataStreamSource<String> kafkaDS2 = env.fromSource(MyKafkaUtil.getKafkaSource("ods_db", "dim_app_2022_2"), WatermarkStrategy.noWatermarks(), "ods_db_Source");
+        DataStreamSource<String> kafkaDS1 = env.addSource(MyKafkaUtilHongda.getKafkaConsumer("ods_db", "dim_app_2022_1"));
+        DataStreamSource<String> kafkaDS2 = env.fromSource(MyKafkaUtilHongda.getKafkaSource("ods_db", "dim_app_2022_2"), WatermarkStrategy.noWatermarks(), "ods_db_Source");
 
         kafkaDS1.print("version111111");
         kafkaDS2.print("version222222");

@@ -1,17 +1,16 @@
-package com.hongda.gmall.realtime.app.dwd.log;
+package com.hongda.gmall.realtime.app.dwd.core_log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.hongda.gmall.realtime.util.DateFormatUtil;
-import com.hongda.gmall.realtime.util.MyKafkaUtil;
+import com.hongda.gmall.realtime.util.MyKafkaUtilHongda;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.runtime.state.hashmap.HashMapStateBackend;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
@@ -23,6 +22,12 @@ import org.apache.flink.util.OutputTag;
 
 //数据流：web/app -> nginx -> 日志服务器(log) -> Flume -> Kafka(ODS) -> FlinkApp -> Kafka(DWD)
 //程  序：  Mock -> f1.sh -> Kafka(ZK) -> BaseLogApp -> Kafka(ZK)
+/*
+知识点:
+1. keybystream的状态编程
+2. 侧输出流的使用
+    使用侧输出流对主流做分流.
+ */
 public class BaseLogApp {
 
     public static void main(String[] args) throws Exception {
@@ -38,7 +43,7 @@ public class BaseLogApp {
 
         //TODO 2.读取Kafka topic_log 主题的数据创建流
 //        DataStreamSource<String> kafkaDS = env.addSource(MyKafkaUtil.getKafkaConsumer("ods_log", "base_log_app_2022"));
-        DataStreamSource<String> kafkaDS = env.fromSource(MyKafkaUtil.getKafkaSource("ods_log", "base_log_app_2022"), WatermarkStrategy.noWatermarks(), "ods_log_Source");
+        DataStreamSource<String> kafkaDS = env.fromSource(MyKafkaUtilHongda.getKafkaSource("ods_log", "base_log_app_2022"), WatermarkStrategy.noWatermarks(), "ods_log_Source");
         kafkaDS.print("kafkasource>>");
 
         //TODO 3.将数据转换为JSON格式,并过滤掉非JSON格式的数据
@@ -221,11 +226,11 @@ public class BaseLogApp {
         String action_topic = "dwd_traffic_action_log";
         String error_topic = "dwd_traffic_error_log";
 
-        pageDS.sinkTo(MyKafkaUtil.getKafkaSink(env,page_topic));
-        startDS.sinkTo(MyKafkaUtil.getKafkaSink(env,start_topic));
-        errorDS.sinkTo(MyKafkaUtil.getKafkaSink(env,error_topic));
-        displayDS.sinkTo(MyKafkaUtil.getKafkaSink(env,display_topic));
-        actionDS.sinkTo(MyKafkaUtil.getKafkaSink(env,action_topic));
+        pageDS.sinkTo(MyKafkaUtilHongda.getKafkaSink(env,page_topic));
+        startDS.sinkTo(MyKafkaUtilHongda.getKafkaSink(env,start_topic));
+        errorDS.sinkTo(MyKafkaUtilHongda.getKafkaSink(env,error_topic));
+        displayDS.sinkTo(MyKafkaUtilHongda.getKafkaSink(env,display_topic));
+        actionDS.sinkTo(MyKafkaUtilHongda.getKafkaSink(env,action_topic));
 
         //TODO 8.启动
         env.execute("BaseLogApp");

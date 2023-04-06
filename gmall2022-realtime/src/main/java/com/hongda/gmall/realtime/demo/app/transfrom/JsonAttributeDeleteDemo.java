@@ -1,4 +1,4 @@
-package com.hongda.gmall.realtime.apidemo;
+package com.hongda.gmall.realtime.demo.app.transfrom;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;

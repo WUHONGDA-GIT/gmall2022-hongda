@@ -13,6 +13,11 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Set;
 
+/*
+知识点:
+1. 自定义Sink,
+    实现多表jdbc写入.
+ */
 /**
  * 类描述: 自定义一个jdbc_sink, 实现根据data类型, 通过jdbc, 写多张表的功能.
  * 技术说明: abstract class RichSinkFunction<IN>: 泛型IN, 代表输入的数据类型
@@ -27,6 +32,9 @@ public class DimSinkFunction extends RichSinkFunction<JSONObject> {
     }
 
     //value：{"sinkTable":"dim_xxx","database":"gmall","table":"base_trademark","type":"insert","ts":1592270938,"xid":13090,"xoffset":1573,"data":{"id":"12","tm_name":"atguigu"},"old":{}}
+    /*
+    invoke==调用, 用于表示,每流过一个元素, 该函数就会被调用一次,来处理当前元素
+     */
     @Override
     public void invoke(JSONObject value, Context context) throws Exception {
 
@@ -67,7 +75,6 @@ public class DimSinkFunction extends RichSinkFunction<JSONObject> {
      * @return upsert into db.tn(id,tm_name,logo_url) values ('12','atguigu','/aaa/bbb')
      */
     private String genUpsertSql(String sinkTable, JSONObject data) {
-
         Set<String> columns = data.keySet();
         Collection<Object> values = data.values();
 
@@ -76,4 +83,5 @@ public class DimSinkFunction extends RichSinkFunction<JSONObject> {
                 StringUtils.join(columns, ",") + ") values ('" +
                 StringUtils.join(values, "','") + "')";
     }
+
 }
