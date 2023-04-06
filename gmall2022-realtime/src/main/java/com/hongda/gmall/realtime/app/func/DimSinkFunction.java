@@ -1,4 +1,4 @@
-package com.hongda.gmall.realtime.app.dim;
+package com.hongda.gmall.realtime.app.func;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hongda.gmall.realtime.common.GmallConfig;

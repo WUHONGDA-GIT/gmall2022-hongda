@@ -2,6 +2,7 @@ package com.hongda.gmall.realtime.app.dim;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.hongda.gmall.realtime.app.func.DimSinkFunction;
 import com.hongda.gmall.realtime.app.func.TableProcessFunction;
 import com.hongda.gmall.realtime.bean.TableProcess;
 import com.hongda.gmall.realtime.util.MyKafkaUtil;
