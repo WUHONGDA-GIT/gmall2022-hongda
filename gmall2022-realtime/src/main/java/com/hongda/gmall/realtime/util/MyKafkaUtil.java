@@ -1,4 +1,4 @@
-package com.hongda.gmall.realtime.util;
+package com.hongda.gmall.realtime.util;;
 
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
@@ -6,6 +6,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.flink.streaming.connectors.kafka.KafkaDeserializationSchema;
+import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
@@ -14,18 +15,15 @@ import java.util.Properties;
 public class MyKafkaUtil {
 
     private static Properties properties = new Properties();
-    private static final String KAFKA_SERVER = "hadoop102:9092";
+    private static final String BOOTSTRAP_SERVERS = "hadoop102:9092";
 
     static {
-        properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
+        properties.setProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
     }
 
-    public static FlinkKafkaConsumer<String> getFlinkKafkaConsumer(String topic, String groupId) {
-
-        properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-
-        return new FlinkKafkaConsumer<String>(
-                topic,
+    public static FlinkKafkaConsumer<String> getKafkaConsumer(String topic, String group_id) {
+        properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, group_id);
+        return new FlinkKafkaConsumer<String>(topic,
                 new KafkaDeserializationSchema<String>() {
                     @Override
                     public boolean isEndOfStream(String nextElement) {
@@ -35,7 +33,7 @@ public class MyKafkaUtil {
                     @Override
                     public String deserialize(ConsumerRecord<byte[], byte[]> record) throws Exception {
                         if (record == null || record.value() == null) {
-                            return null;
+                            return "";
                         } else {
                             return new String(record.value());
                         }
@@ -49,52 +47,55 @@ public class MyKafkaUtil {
                 properties);
     }
 
-    public static FlinkKafkaProducer<String> getFlinkKafkaProducer(String topic) {
+    public static FlinkKafkaProducer<String> getKafkaProducer(String topic) {
         return new FlinkKafkaProducer<String>(topic,
                 new SimpleStringSchema(),
                 properties);
     }
 
+    /**
+     * Kafka-Source DDL 语句
+     *
+     * @param topic   数据源主题
+     * @param groupId 消费者组
+     * @return 拼接好的 Kafka 数据源 DDL 语句
+     */
     public static String getKafkaDDL(String topic, String groupId) {
-        return " WITH ( " +
-                "  'connector' = 'kafka', " +
-                "  'topic' = '" + topic + "', " +
-                "  'properties.bootstrap.servers' = '" + KAFKA_SERVER + "', " +
-                "  'properties.group.id' = '" + groupId + "', " +
-                "  'scan.startup.mode' = 'latest-offset', " +
-                "  'format' = 'json' " +
-                ")";
+        return " with ('connector' = 'kafka', " +
+                " 'topic' = '" + topic + "'," +
+                " 'properties.bootstrap.servers' = '" + BOOTSTRAP_SERVERS + "', " +
+                " 'properties.group.id' = '" + groupId + "', " +
+                " 'format' = 'json', " +
+                " 'scan.startup.mode' = 'latest-offset')";
     }
 
-    public static String getInsertKafkaDDL(String topic) {
-        return " WITH ( " +
-                "  'connector' = 'kafka', " +
-                "  'topic' = '" + topic + "', " +
-                "  'properties.bootstrap.servers' = '" + KAFKA_SERVER + "', " +
-                "  'format' = 'json' " +
-                ")";
-    }
-
+    /**
+     * Kafka-Sink DDL 语句
+     *
+     * @param topic 输出到 Kafka 的目标主题
+     * @return 拼接好的 Kafka-Sink DDL 语句
+     */
     public static String getUpsertKafkaDDL(String topic) {
-        return " WITH ( " +
-                "'connector' = 'upsert-kafka', " +
-                "'topic' = '" + topic + "', " +
-                "'properties.bootstrap.servers' = 'hadoop102:9092', " +
-                "'key.format' = 'json', " +
-                "'value.format' = 'json' " +
+
+        return "WITH ( " +
+                "  'connector' = 'upsert-kafka', " +
+                "  'topic' = '" + topic + "', " +
+                "  'properties.bootstrap.servers' = '" + BOOTSTRAP_SERVERS + "', " +
+                "  'key.format' = 'json', " +
+                "  'value.format' = 'json' " +
                 ")";
     }
 
-    public static String getTopicDb(String groupId) {
+    public static String getTopicDbDDL(String groupId) {
         return "CREATE TABLE topic_db ( " +
-                "  `database` STRING, " +
-                "  `table` STRING, " +
-                "  `type` STRING, " +
-                "  `ts` BIGINT, " +
-                "  `data` Map<STRING,STRING>, " +
-                "  `old` Map<STRING,STRING>, " +
+                "  `database` String, " +
+                "  `table` String, " +
+                "  `type` String, " +
+                "  `data` Map<String,String>, " +
+                "  `old` Map<String,String>, " +
                 "  `pt` AS PROCTIME() " +
-                ")" + getKafkaDDL("topic_db", groupId);
+                ")" + MyKafkaUtil.getKafkaDDL("topic_db", groupId);
     }
+
 
 }

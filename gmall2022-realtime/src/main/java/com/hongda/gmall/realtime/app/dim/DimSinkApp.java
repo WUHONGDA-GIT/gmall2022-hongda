@@ -35,7 +35,7 @@ public class DimSinkApp {
 
         //TODO 2.读取 Kafka topic_db 主题数据创建流
 //        DataStreamSource<String> kafkaDS = env.addSource(MyKafkaUtilHongda.getKafkaConsumer("ods_db", "dim_app_2022"));
-        DataStreamSource<String> kafkaDS = env.addSource(MyKafkaUtil.getFlinkKafkaConsumer("ods_db", "dim_app_2022_2"));
+        DataStreamSource<String> kafkaDS = env.addSource(MyKafkaUtil.getKafkaConsumer("ods_db", "dim_app_2022_2"));
 
         //TODO 3.过滤掉非JSON格式的数据,并将其写入侧输出流
         //创建侧输出流
