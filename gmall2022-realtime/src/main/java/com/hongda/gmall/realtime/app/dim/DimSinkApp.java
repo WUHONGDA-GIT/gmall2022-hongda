@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hongda.gmall.realtime.app.func.TableProcessFunction;
 import com.hongda.gmall.realtime.bean.TableProcess;
-import com.hongda.gmall.realtime.util.MyKafkaUtilHongda;
+import com.hongda.gmall.realtime.util.MyKafkaUtil;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import com.ververica.cdc.connectors.mysql.table.StartupOptions;
 import com.ververica.cdc.debezium.JsonDebeziumDeserializationSchema;
@@ -34,8 +34,8 @@ public class DimSinkApp {
 
 
         //TODO 2.读取 Kafka topic_db 主题数据创建流
-        DataStreamSource<String> kafkaDS = env.addSource(MyKafkaUtilHongda.getKafkaConsumer("ods_db", "dim_app_2022"));
-//        DataStreamSource<String> kafkaDS = env.fromSource(MyKafkaUtil.getKafkaSource("ods_db", "dim_app_2022_2"), WatermarkStrategy.noWatermarks(), "ods_db_Source");
+//        DataStreamSource<String> kafkaDS = env.addSource(MyKafkaUtilHongda.getKafkaConsumer("ods_db", "dim_app_2022"));
+        DataStreamSource<String> kafkaDS = env.addSource(MyKafkaUtil.getFlinkKafkaConsumer("ods_db", "dim_app_2022_2"));
 
         //TODO 3.过滤掉非JSON格式的数据,并将其写入侧输出流
         //创建侧输出流
@@ -111,12 +111,12 @@ public class DimSinkApp {
          */
         SingleOutputStreamOperator<JSONObject> hbaseDS = connectedStream.process(new TableProcessFunction(mapStateDescriptor));
 
-//        //TODO 8.将数据写出到Phoenix中
-//        //思考
-//        //为什么不能用jdbc? jdbc只适合往单表里面写, 不适合写多表
-//        //为什么要继承richFunc, 因为要在进程环境启动时, 提前建立好连接, 所以会用到open方法
-//        hbaseDS.print(">>>>>>>>>>>>>");
-//        hbaseDS.addSink(new DimSinkFunction());
+        //TODO 8.将数据写出到Phoenix中
+        //思考
+        //为什么不能用jdbc? jdbc只适合往单表里面写, 不适合写多表
+        //为什么要继承richFunc, 因为要在进程环境启动时, 提前建立好连接, 所以会用到open方法
+        hbaseDS.print(">>>>>>>>>>>>>");
+        hbaseDS.addSink(new DimSinkFunction());
 
         //TODO 9.启动任务
         env.execute("DimApp");
