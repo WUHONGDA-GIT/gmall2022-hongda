@@ -116,7 +116,7 @@ public class DimSinkApp {
         //思考
         //为什么不能用jdbc? jdbc只适合往单表里面写, 不适合写多表
         //为什么要继承richFunc, 因为要在进程环境启动时, 提前建立好连接, 所以会用到open方法
-        hbaseDS.print(">>>>>>>>>>>>>");
+        hbaseDS.print("dimsink>>>>>>>>>>>>>");
         hbaseDS.addSink(new DimSinkFunction());
 
         //TODO 9.启动任务
