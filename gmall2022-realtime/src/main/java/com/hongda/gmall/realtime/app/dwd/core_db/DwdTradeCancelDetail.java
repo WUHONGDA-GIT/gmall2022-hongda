@@ -2,6 +2,7 @@ package com.hongda.gmall.realtime.app.dwd.core_db;
 
 
 import com.hongda.gmall.realtime.util.MyKafkaUtil;
+import lombok.val;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -15,7 +16,15 @@ public class DwdTradeCancelDetail {
     public static void main(String[] args) throws Exception {
 
         //TODO 1.获取执行环境
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+//        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+//        env.setParallelism(1);
+//        StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
+
+        //TODO 1.获取执行环境_带WebUI
+        Configuration conf = new Configuration();
+        conf.setString(RestOptions.BIND_PORT, "8081"); // 指定访问端口
+        StreamExecutionEnvironment env = StreamExecutionEnvironment
+                .createLocalEnvironmentWithWebUI(conf);
         env.setParallelism(1);
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
 

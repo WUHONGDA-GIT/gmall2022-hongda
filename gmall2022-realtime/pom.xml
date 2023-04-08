@@ -149,6 +149,14 @@
             <artifactId>flink-cep_${scala.version}</artifactId>
             <version>${flink.version}</version>
         </dependency>
+        <!-- 实现idea运行任务, 本地访问UI
+        -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-runtime-web_2.11</artifactId>
+            <version>${flink.version}</version>
+            <scope>${scope.type}</scope>
+        </dependency>
 
     </dependencies>
     <build>
