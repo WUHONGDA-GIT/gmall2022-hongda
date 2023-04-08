@@ -2,9 +2,11 @@ package com.hongda.gmall.realtime.app.dwd.core_db;
 
 
 import com.hongda.gmall.realtime.util.MyKafkaUtil;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import org.apache.flink.types.Row;
 
 public class DwdTradeCancelDetail {
 
@@ -77,6 +79,8 @@ public class DwdTradeCancelDetail {
                 "and order_status='1003'");
         tableEnv.createTemporaryView("filter_table", filterTable);
 
+
+
         //TODO 4.创建Kafka下单数据表
         tableEnv.executeSql("" +
                 "create table dwd_trade_cancel_detail_table ( " +
@@ -125,10 +129,22 @@ public class DwdTradeCancelDetail {
                 ")" + MyKafkaUtil.getKafkaDDL("dwd_trade_cancel_detail", ""));
 
         //TODO 5.将数据写出到Kafka
-        tableEnv.executeSql("insert into dwd_trade_cancel_detail_table select * from filter_table")
-                .print();
+        tableEnv.executeSql("insert into dwd_trade_cancel_detail_table select * from filter_table");
 
-        //TODO 6.启动任务
+        filterTable.execute().print();//只要使用相同的table api行动算子, 就可以看到控制台的输出了;
+
+//        /*
+//        * 为什么看不到控制台的内容?
+//        * 由于 Table API 和 DataStream API 的执行环境不同，
+//        * 所以 tableEnv.executeSql() 中的写入 Kafka 操作和 DataStream API 中的 print() 操作实际上是在两个不同的任务中执行的。
+//        * 这就是为什么您看不到控制台输出的原因。
+//        * */
+//        //TODO 打印到控制台
+//        Table table = tableEnv.sqlQuery("select * from filter_table");
+//        DataStream<Row> rowDataStream = tableEnv.toAppendStream(table, Row.class);
+//        rowDataStream.print(">>>>>>>>>>>");
+
+        //TODO 7.启动任务
         env.execute("DwdTradeCancelDetail");
 
     }
