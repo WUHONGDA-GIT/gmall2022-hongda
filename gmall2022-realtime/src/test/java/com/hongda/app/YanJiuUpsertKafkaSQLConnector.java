@@ -1,6 +1,8 @@
 package com.hongda.app;
 
 import com.hongda.gmall.realtime.util.MyKafkaUtil;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
@@ -12,10 +14,18 @@ public class YanJiuUpsertKafkaSQLConnector {
 
     public static void main(String[] args) throws Exception {
 
-        //TODO 1.获取执行环境
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+//        //TODO 1.获取执行环境
+//        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+//        env.setParallelism(1);
+//        StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
+
+        //TODO 1.获取执行环境_带WebUI
+        Configuration conf = new Configuration();
+        conf.setString(RestOptions.BIND_PORT, "8081"); // 指定访问端口
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
         env.setParallelism(1);
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
+
 
         //env.setStateBackend(new HashMapStateBackend());
         //env.enableCheckpointing(5000L);
@@ -23,11 +33,11 @@ public class YanJiuUpsertKafkaSQLConnector {
         //env.getCheckpointConfig().setCheckpointStorage("hdfs:xxx:8020//xxx/xx");
 
         //设置状态存储时间
-//        tableEnv.getConfig().setIdleStateRetention(Duration.ofDays(3));
+        tableEnv.getConfig().setIdleStateRetention(Duration.ofDays(3));
 
         //TODO 2.使用DDL方式读取 Kafka ods_db 主题的数据
-        tableEnv.executeSql(MyKafkaUtil.getTopicDbDDL("dwd_trade_order_detail_211027"));
-//        tableEnv.executeSql(MyKafkaUtil.getUpsertKafkaDDL("dwd_trade_order_detail_211027"));
+        tableEnv.executeSql(MyKafkaUtil.getTopicDbDDL("dwd_trade_order_detailtest_211027"));
+//        tableEnv.executeSql(MyKafkaUtil.getUpsertKafkaDDL("dwd_trade_order_detailtest_211027"));
 
 
 //        //TODO 3.过滤出订单明细数据
@@ -121,14 +131,12 @@ public class YanJiuUpsertKafkaSQLConnector {
                 ")" + MyKafkaUtil.getUpsertKafkaDDL("dwd_trade_order_detail_test"));
 
         //TODO 10.将数据写出
-        tableEnv.executeSql("insert into dwd_trade_order_detail_test select * from result_table").print();
+        tableEnv.executeSql("insert into dwd_trade_order_detail_test select * from result_table");
+//                .print();//多余代码可以删除
 
 
         //TODO 11.启动任务
-        env.execute("DwdTradeOrderDetail");
-
-
-
+//        env.execute("xxxxxxx"); //多余代码, 可以删除
 
     }
 

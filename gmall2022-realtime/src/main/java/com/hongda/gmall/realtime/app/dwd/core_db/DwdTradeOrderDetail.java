@@ -2,6 +2,8 @@ package com.hongda.gmall.realtime.app.dwd.core_db;
 
 import com.hongda.gmall.realtime.util.MyKafkaUtil;
 import com.hongda.gmall.realtime.util.MysqlUtil;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
@@ -13,8 +15,15 @@ public class DwdTradeOrderDetail {
 
     public static void main(String[] args) throws Exception {
 
-        //TODO 1.获取执行环境
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+//        //TODO 1.获取执行环境
+//        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+//        env.setParallelism(1);
+//        StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
+
+        //TODO 1.获取执行环境_带WebUI
+        Configuration conf = new Configuration();
+        conf.setString(RestOptions.BIND_PORT, "8081"); // 指定访问端口
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
         env.setParallelism(1);
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
 
@@ -53,8 +62,8 @@ public class DwdTradeOrderDetail {
         tableEnv.createTemporaryView("order_detail", orderDetailTable);
 
 //        //打印测试
-//        Table table = tableEnv.sqlQuery("select * from order_detail");
-//        tableEnv.toAppendStream(table, Row.class).print(">>>>>>>>>");
+//        Table table1 = tableEnv.sqlQuery("select * from order_detail");
+//        tableEnv.toAppendStream(table1, Row.class).print(">>>>>>>>>");
 
         //TODO 4.过滤出订单数据
         Table orderInfoTable = tableEnv.sqlQuery("" +
@@ -88,8 +97,8 @@ public class DwdTradeOrderDetail {
         tableEnv.createTemporaryView("order_info", orderInfoTable);
 
         //打印测试
-        //Table table = tableEnv.sqlQuery("select * from order_info");
-        //tableEnv.toAppendStream(table, Row.class).print(">>>>>>>>>");
+//        Table table = tableEnv.sqlQuery("select * from order_info");
+//        tableEnv.toAppendStream(table, Row.class).print(">>>>>>>>>");
 
         //TODO 5.过滤出订单明细活动数据
         Table orderActivityTable = tableEnv.sqlQuery("" +
@@ -108,8 +117,8 @@ public class DwdTradeOrderDetail {
         tableEnv.createTemporaryView("order_activity", orderActivityTable);
 
         //打印测试
-        //Table table = tableEnv.sqlQuery("select * from order_activity");
-        //tableEnv.toAppendStream(table, Row.class).print(">>>>>>>>>");
+//        Table table2 = tableEnv.sqlQuery("select * from order_activity");
+//        tableEnv.toAppendStream(table2, Row.class).print(">>>>>>>>>");
 
         //TODO 6.过滤出订单明细购物券数据
         Table orderCouponTable = tableEnv.sqlQuery("" +
@@ -128,8 +137,8 @@ public class DwdTradeOrderDetail {
         tableEnv.createTemporaryView("order_coupon", orderCouponTable);
 
         //打印测试
-        //Table table = tableEnv.sqlQuery("select * from order_coupon");
-        //tableEnv.toAppendStream(table, Row.class).print(">>>>>>>>>");
+//        Table table3 = tableEnv.sqlQuery("select * from order_coupon");
+//        tableEnv.toAppendStream(table3, Row.class).print(">>>>>>>>>");
 
         //TODO 7.构建MySQL-lookup表  base_dic
         tableEnv.executeSql(MysqlUtil.getBaseDicLookUpDDL());
@@ -196,8 +205,8 @@ public class DwdTradeOrderDetail {
         tableEnv.createTemporaryView("result_table", resultTable);
 
         //打印测试
-        //Table table = tableEnv.sqlQuery("select * from result_table");
-        //tableEnv.toChangelogStream(table).print(">>>>>>>>>");
+//        Table table4 = tableEnv.sqlQuery("select * from result_table");
+//        tableEnv.toChangelogStream(table4).print(">>>>>>>>>");
 
         //TODO 9.创建Kafka upsert-kafka表
         tableEnv.executeSql("" +
