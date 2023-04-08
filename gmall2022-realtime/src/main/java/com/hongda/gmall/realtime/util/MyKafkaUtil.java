@@ -29,7 +29,9 @@ public class MyKafkaUtil {
                     public boolean isEndOfStream(String nextElement) {
                         return false;
                     }
-
+                    /*
+                    自定义了序列化器, 因为框架提供的simpleStringSchema不允许字节流-byte数组存在空值;
+                     */
                     @Override
                     public String deserialize(ConsumerRecord<byte[], byte[]> record) throws Exception {
                         if (record == null || record.value() == null) {
