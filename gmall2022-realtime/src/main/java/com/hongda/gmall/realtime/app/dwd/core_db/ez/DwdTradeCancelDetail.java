@@ -1,4 +1,4 @@
-package com.hongda.gmall.realtime.app.dwd.core_db;
+package com.hongda.gmall.realtime.app.dwd.core_db.ez;
 
 
 import com.hongda.gmall.realtime.util.MyKafkaUtil;

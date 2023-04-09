@@ -16,16 +16,16 @@ public class DwdTradeOrderDetail {
     public static void main(String[] args) throws Exception {
 
 //        //TODO 1.获取执行环境
-//        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-//        env.setParallelism(1);
-//        StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
-
-        //TODO 1.获取执行环境_带WebUI
-        Configuration conf = new Configuration();
-        conf.setString(RestOptions.BIND_PORT, "8081"); // 指定访问端口
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
+
+        //TODO 1.获取执行环境_带WebUI
+//        Configuration conf = new Configuration();
+//        conf.setString(RestOptions.BIND_PORT, "8081"); // 指定访问端口
+//        StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
+//        env.setParallelism(1);
+//        StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
 
         //env.setStateBackend(new HashMapStateBackend());
         //env.enableCheckpointing(5000L);

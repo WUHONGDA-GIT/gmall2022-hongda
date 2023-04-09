@@ -21,7 +21,7 @@ public class YanJiuUpsertKafkaSQLConnector {
 
         //TODO 1.获取执行环境_带WebUI
         Configuration conf = new Configuration();
-        conf.setString(RestOptions.BIND_PORT, "8081"); // 指定访问端口
+        conf.setString(RestOptions.BIND_PORT, "8083"); // 指定访问端口
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
         env.setParallelism(1);
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
@@ -64,8 +64,8 @@ public class YanJiuUpsertKafkaSQLConnector {
         tableEnv.createTemporaryView("order_detail", orderDetailTable);
 
         //打印测试
-//        Table table = tableEnv.sqlQuery("select * from order_detail");
-//        tableEnv.toAppendStream(table, Row.class).print(">>>>>>>>>");
+        Table table = tableEnv.sqlQuery("select * from order_detail");
+        tableEnv.toAppendStream(table, Row.class).print(">>>>>>>>>");
 //        tableEnv.toChangelogStream(table).print(">>>>>>>>>");
 //        tableEnv.toRetractStream(table, Row.class).print(">>>>>>>>>");
 
