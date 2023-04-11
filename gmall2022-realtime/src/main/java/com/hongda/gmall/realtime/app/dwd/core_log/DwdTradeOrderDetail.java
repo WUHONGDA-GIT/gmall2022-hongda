@@ -1,4 +1,4 @@
-package com.hongda.gmall.realtime.app.dwd.core_db;
+package com.hongda.gmall.realtime.app.dwd.core_log;
 
 import com.hongda.gmall.realtime.util.MyKafkaUtil;
 import com.hongda.gmall.realtime.util.MysqlUtil;
