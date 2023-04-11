@@ -1,4 +1,4 @@
-package com.hongda.gmall.realtime.app.dws;
+package com.hongda.gmall.realtime.app.dws.ez;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;

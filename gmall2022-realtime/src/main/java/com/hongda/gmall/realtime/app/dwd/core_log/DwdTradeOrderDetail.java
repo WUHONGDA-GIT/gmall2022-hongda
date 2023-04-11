@@ -33,6 +33,7 @@ public class DwdTradeOrderDetail {
         //env.getCheckpointConfig().setCheckpointStorage("hdfs:xxx:8020//xxx/xx");
 
         //设置状态存储时间
+        /*需要配合业务过程的生命周期, 必须要大于业务生命周期, 业务结束了, 状态才能删除, 否则会出现err数据*/
         tableEnv.getConfig().setIdleStateRetention(Duration.ofDays(3));
 
         //TODO 2.使用DDL方式读取 Kafka ods_db 主题的数据
@@ -62,8 +63,8 @@ public class DwdTradeOrderDetail {
         tableEnv.createTemporaryView("order_detail", orderDetailTable);
 
 //        //打印测试
-//        Table table1 = tableEnv.sqlQuery("select * from order_detail");
-//        tableEnv.toAppendStream(table1, Row.class).print(">>>>>>>>>");
+        Table table1 = tableEnv.sqlQuery("select * from order_detail");
+        tableEnv.toAppendStream(table1, Row.class).print(">>>>>>>>>");
 
         //TODO 4.过滤出订单数据
         Table orderInfoTable = tableEnv.sqlQuery("" +
@@ -97,8 +98,8 @@ public class DwdTradeOrderDetail {
         tableEnv.createTemporaryView("order_info", orderInfoTable);
 
         //打印测试
-//        Table table = tableEnv.sqlQuery("select * from order_info");
-//        tableEnv.toAppendStream(table, Row.class).print(">>>>>>>>>");
+        Table table = tableEnv.sqlQuery("select * from order_info");
+        tableEnv.toAppendStream(table, Row.class).print(">>>>>>>>>");
 
         //TODO 5.过滤出订单明细活动数据
         Table orderActivityTable = tableEnv.sqlQuery("" +
@@ -117,8 +118,8 @@ public class DwdTradeOrderDetail {
         tableEnv.createTemporaryView("order_activity", orderActivityTable);
 
         //打印测试
-//        Table table2 = tableEnv.sqlQuery("select * from order_activity");
-//        tableEnv.toAppendStream(table2, Row.class).print(">>>>>>>>>");
+        Table table2 = tableEnv.sqlQuery("select * from order_activity");
+        tableEnv.toAppendStream(table2, Row.class).print(">>>>>>>>>");
 
         //TODO 6.过滤出订单明细购物券数据
         Table orderCouponTable = tableEnv.sqlQuery("" +
@@ -137,8 +138,8 @@ public class DwdTradeOrderDetail {
         tableEnv.createTemporaryView("order_coupon", orderCouponTable);
 
         //打印测试
-//        Table table3 = tableEnv.sqlQuery("select * from order_coupon");
-//        tableEnv.toAppendStream(table3, Row.class).print(">>>>>>>>>");
+        Table table3 = tableEnv.sqlQuery("select * from order_coupon");
+        tableEnv.toAppendStream(table3, Row.class).print(">>>>>>>>>");
 
         //TODO 7.构建MySQL-lookup表  base_dic
         tableEnv.executeSql(MysqlUtil.getBaseDicLookUpDDL());
@@ -205,12 +206,12 @@ public class DwdTradeOrderDetail {
         tableEnv.createTemporaryView("result_table", resultTable);
 
         //打印测试
-//        Table table4 = tableEnv.sqlQuery("select * from result_table");
-//        tableEnv.toChangelogStream(table4).print(">>>>>>>>>");
+        Table table4 = tableEnv.sqlQuery("select * from result_table");
+        tableEnv.toChangelogStream(table4).print(">>>>>>>>>");
 
         //TODO 9.创建Kafka upsert-kafka表
         tableEnv.executeSql("" +
-                "create table dwd_trade_order_detail_table( " +
+                "create table dwd_trade_order_detail( " +
                 "    `order_detail_id` string, " +
                 "    `order_id` string, " +
                 "    `sku_id` string, " +
@@ -258,7 +259,7 @@ public class DwdTradeOrderDetail {
                 ")" + MyKafkaUtil.getUpsertKafkaDDL("dwd_trade_order_detail"));
 
         //TODO 10.将数据写出
-        tableEnv.executeSql("insert into dwd_trade_order_detail_table select * from result_table").print();
+        tableEnv.executeSql("insert into dwd_trade_order_detail select * from result_table").print();
 
         //TODO 11.启动任务
         env.execute("DwdTradeOrderDetail");
