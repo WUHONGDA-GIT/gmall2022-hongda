@@ -1,4 +1,4 @@
-package com.hongda.gmall.realtime.app.dwd.core_log;
+package com.hongda.gmall.realtime.app.dwd.core_db;
 
 import com.hongda.gmall.realtime.util.MyKafkaUtil;
 import com.hongda.gmall.realtime.util.MysqlUtil;
@@ -259,7 +259,7 @@ public class DwdTradeOrderDetail {
                 ")" + MyKafkaUtil.getUpsertKafkaDDL("dwd_trade_order_detail"));
 
         //TODO 10.将数据写出
-        tableEnv.executeSql("insert into dwd_trade_order_detail select * from result_table").print();
+        tableEnv.executeSql("insert into  select * from result_table").print();
 
         //TODO 11.启动任务
         env.execute("DwdTradeOrderDetail");
