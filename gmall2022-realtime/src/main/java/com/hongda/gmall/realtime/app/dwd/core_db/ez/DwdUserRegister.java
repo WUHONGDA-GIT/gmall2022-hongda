@@ -4,6 +4,7 @@ import com.hongda.gmall.realtime.util.MyKafkaUtil;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import org.apache.flink.types.Row;
 
 import java.time.ZoneId;
 
@@ -49,6 +50,10 @@ public class DwdUserRegister {
                 "where `table` = 'user_info' " +
                 "and `type` = 'insert' ");
         tableEnv.createTemporaryView("user_info", userInfo);
+
+        //打印测试
+//        Table table1 = tableEnv.sqlQuery("select * from user_info");
+//        tableEnv.toAppendStream(table1, Row.class).print("user_info>>>>>>>>>");
 
         // TODO 5. 创建 Upsert-Kafka dwd_user_register 表
         tableEnv.executeSql("create table `dwd_user_register`( " +
