@@ -118,9 +118,10 @@ public class DwdTradeCartAdd {
         //rowDataStream.print(">>>>>>>>>>>");
 
         //TODO 6.将数据写回到Kafka DWD层
+        /*可以注意到, 处理时间pt, 并没有落到kafka*/
         String sinkTopic = "dwd_trade_cart_add";
         tableEnv.executeSql("" +
-                "create table trade_cart_add( " +
+                "create table dwd_trade_cart_add( " +
                 "    id string, " +
                 "    user_id string, " +
                 "    sku_id string, " +
@@ -136,7 +137,7 @@ public class DwdTradeCartAdd {
                 "    source_id string, " +
                 "    dic_name string " +
                 ")" + MyKafkaUtil.getKafkaDDL(sinkTopic, ""));
-        tableEnv.executeSql("insert into trade_cart_add select * from result_table")
+        tableEnv.executeSql("insert into dwd_trade_cart_add select * from result_table")
                 .print(); //行动算子,不能剩;
 
 //        //TODO 7.启动任务
